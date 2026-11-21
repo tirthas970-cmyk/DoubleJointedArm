@@ -1,5 +1,3 @@
 package org.sciborgs1155.robot.arm;
 
-public class ArmSim {
-    
-}
+public class ArmSim {}

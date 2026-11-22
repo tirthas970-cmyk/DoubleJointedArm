@@ -1,11 +1,17 @@
 package org.sciborgs1155.robot.arm;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static org.sciborgs1155.robot.Ports.Arm.ELBOW_MOTOR;
 import static org.sciborgs1155.robot.Ports.Arm.SHOULDER_MOTOR;
+import static org.sciborgs1155.robot.arm.ArmConstants.ELBOW_GEAR_RATIO;
+import static org.sciborgs1155.robot.arm.ArmConstants.SHOULDER_GEAR_RATIO;
 import static org.sciborgs1155.robot.arm.ArmConstants.STATOR_LIMIT;
 
+import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -17,7 +23,8 @@ import org.sciborgs1155.lib.FaultLogger;
 public class RealArm implements ArmIO {
   private final SparkFlex shoulderMotor;
   private final SparkFlex elbowMotor;
-  private final SparkFlexConfig config;
+  private final SparkFlexConfig shoulderConfig;
+  private final SparkFlexConfig elbowConfig;
   private final RelativeEncoder shoulderEncoder;
   private final RelativeEncoder elbowEncoder;
 
@@ -28,10 +35,24 @@ public class RealArm implements ArmIO {
     shoulderEncoder = shoulderMotor.getEncoder();
     elbowEncoder = elbowMotor.getEncoder();
 
-    config = new SparkFlexConfig();
+    shoulderConfig = new SparkFlexConfig();
+    shoulderConfig.smartCurrentLimit((int) STATOR_LIMIT.in(Amps)).idleMode(IdleMode.kBrake);
+    shoulderConfig
+        .encoder
+        .positionConversionFactor((2 * Math.PI) / SHOULDER_GEAR_RATIO)
+        .velocityConversionFactor((2 * Math.PI / 60.0) / SHOULDER_GEAR_RATIO);
 
-    config.smartCurrentLimit((int) STATOR_LIMIT.in(Amps));
-    config.idleMode(IdleMode.kBrake);
+    elbowConfig = new SparkFlexConfig();
+    elbowConfig.smartCurrentLimit((int) STATOR_LIMIT.in(Amps)).idleMode(IdleMode.kBrake);
+    elbowConfig
+        .encoder
+        .positionConversionFactor((2 * Math.PI) / ELBOW_GEAR_RATIO)
+        .velocityConversionFactor((2 * Math.PI / 60.0) / ELBOW_GEAR_RATIO);
+
+    shoulderMotor.configure(
+        shoulderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    elbowMotor.configure(
+        elbowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     FaultLogger.register(shoulderMotor);
     FaultLogger.register(elbowMotor);
@@ -49,25 +70,22 @@ public class RealArm implements ArmIO {
 
   @Override
   public Angle getShoulderPosition() {
-    throw new UnsupportedOperationException("Unimplemented method 'getShoulderPosition'");
+    return Radians.of(shoulderEncoder.getPosition());
   }
 
   @Override
   public Angle getElbowPosition() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getElbowPosition'");
+    return Radians.of(elbowEncoder.getPosition());
   }
 
   @Override
   public AngularVelocity shoulderVelocity() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'shoulderVelocity'");
+    return RadiansPerSecond.of(shoulderEncoder.getVelocity());
   }
 
   @Override
   public AngularVelocity elbowVelocity() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'ElbowVelocity'");
+    return RadiansPerSecond.of(elbowEncoder.getVelocity());
   }
 
   @Override

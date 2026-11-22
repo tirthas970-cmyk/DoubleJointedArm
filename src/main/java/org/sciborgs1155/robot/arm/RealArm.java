@@ -21,6 +21,7 @@ public class RealArm implements ArmIO {
   private final RelativeEncoder shoulderEncoder;
   private final RelativeEncoder elbowEncoder;
 
+  /** Configs and creates RealArm */
   public RealArm() {
     shoulderMotor = new SparkFlex(SHOULDER_MOTOR, MotorType.kBrushless);
     elbowMotor = new SparkFlex(ELBOW_MOTOR, MotorType.kBrushless);
@@ -64,7 +65,7 @@ public class RealArm implements ArmIO {
   }
 
   @Override
-  public AngularVelocity ElbowVelocity() {
+  public AngularVelocity elbowVelocity() {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'ElbowVelocity'");
   }

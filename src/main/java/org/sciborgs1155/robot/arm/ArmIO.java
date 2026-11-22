@@ -37,5 +37,5 @@ public interface ArmIO extends AutoCloseable {
   /**
    * @return velocity of elbow in radians per sec
    */
-  AngularVelocity ElbowVelocity();
+  AngularVelocity elbowVelocity();
 }

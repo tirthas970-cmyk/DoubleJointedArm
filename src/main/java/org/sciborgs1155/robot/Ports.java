@@ -62,5 +62,7 @@ public final class Ports {
   public static final class Arm {
     public static final int SHOULDER_MOTOR = 30;
     public static final int ELBOW_MOTOR = 31;
+
+    private Arm() {}
   }
 }
